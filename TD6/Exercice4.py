@@ -18,4 +18,4 @@ import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
 ax.bar(range(10), compte)
-fig.savefig("diagram.pdf")
+fig.savefig("TD6/Exercice4.pdf")
