@@ -1,5 +1,4 @@
-from ex6 import trier
-
+from Exercice6 import trier
 
 assert trier([4, 2, 1]) == [1, 2, 4]
 assert trier([]) == []
