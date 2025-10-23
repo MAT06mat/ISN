@@ -27,6 +27,11 @@ class BoxInfos(BoxLayout):
         self.update_info()
         super().__init__(**kwargs)
 
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.game.toggle_simulation()
+        return super().on_touch_down(touch)
+
     def update_info(self, *args):
         self.info_text = INFO_TEMPLATE.format(
             pop=self.game.population,

@@ -9,7 +9,7 @@ class GameOfLife(EventDispatcher):
     """Game of life logic"""
 
     RULES = {"survive": [2, 3], "born": [3]}
-    GRID_SIZE: list[int] = ListProperty((50, 50))
+    GRID_SIZE: list[int] = ListProperty((100, 100))
     INIT_LIFE_PROB: float = NumericProperty(0.3)
     SIMULATION_RATE: int = NumericProperty(50)
     FRAME_RATE: int = NumericProperty(30)
