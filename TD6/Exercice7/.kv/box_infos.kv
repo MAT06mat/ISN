@@ -1,4 +1,10 @@
 <BoxInfos>:
     orientation: "vertical"
+    canvas.before:
+        Color:
+            rgba: (.3, .2, 1, .9) if self.grid.is_running else (.9, .9, 1, .2)
+        Rectangle:
+            pos: self.pos
+            size: self.size
     Label:
         text: root.info_text

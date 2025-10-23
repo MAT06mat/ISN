@@ -4,6 +4,7 @@ from screen import Screen
 
 class GameOfLifeApp(App):
     title = "The game of life"
+    icon = "./assets/icon.png"
 
     def build(self):
         return Screen()

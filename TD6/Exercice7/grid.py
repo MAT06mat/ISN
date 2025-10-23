@@ -2,7 +2,7 @@ from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.graphics import Rectangle, Line, Color
-from kivy.properties import NumericProperty, ListProperty
+from kivy.properties import NumericProperty, ListProperty, AliasProperty, ObjectProperty
 from kivy.graphics.texture import Texture
 
 import numpy as np
@@ -46,13 +46,17 @@ class GameOfLife:
 
 
 class Grid(Widget):
-    GRID_SIZE = ListProperty((50, 50))
-    INIT_LIFE_PROB = NumericProperty(0.4)
-    SIMULATION_RATE = NumericProperty(50)
-    FRAME_RATE = NumericProperty(30)
-    iteration = NumericProperty(0)
-    population = NumericProperty(0)
-    update = NumericProperty(0)
+    GRID_SIZE: list[int] = ListProperty((50, 50))
+    INIT_LIFE_PROB: float = NumericProperty(0.3)
+    SIMULATION_RATE: int = NumericProperty(50)
+    FRAME_RATE: int = NumericProperty(30)
+
+    iteration: int = NumericProperty(0)
+    population: int = NumericProperty(0)
+    update: int = NumericProperty(0)
+
+    simulation_event = ObjectProperty(None, allownone=True)
+    display_event = ObjectProperty(None, allownone=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -68,14 +72,12 @@ class Grid(Widget):
         self.texture.mag_filter = "nearest"
         self.texture.min_filter = "nearest"
 
-        self.simulation_event = None
-        self.display_event = None
-
         self.update_display()
 
-    @property
-    def is_running(self):
+    def _is_running(self):
         return self.simulation_event is not None
+
+    is_running = AliasProperty(_is_running, bind=["simulation_event"])
 
     # ------------------------------
     # Events
