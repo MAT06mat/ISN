@@ -1,10 +1,37 @@
 <BoxInfos>:
     orientation: "vertical"
+    size_hint: None, 1
+    width: "200dp"
     canvas.before:
         Color:
-            rgba: (.3, .2, 1, .9) if self.game.is_running else (.9, .9, 1, .2)
+            rgb: .18, .18, .2
         Rectangle:
             pos: self.pos
             size: self.size
     Label:
         text: root.info_text
+    BoxLayout:
+        size_hint: 1, None
+        height: "50dp"
+        Button:
+            text: "-10"
+            on_release: root.game.SIMULATION_RATE -= 10
+        Button:
+            text: "-1"
+            on_release: root.game.SIMULATION_RATE -= 1
+        Button:
+            text: "+1"
+            on_release: root.game.SIMULATION_RATE += 1
+        Button:
+            text: "+10"
+            on_release: root.game.SIMULATION_RATE += 10
+    Button:
+        text: "Stop simulation" if root.game.is_running else "Run simulation"
+        size_hint: 1, None
+        height: "50dp"
+        on_release: root.game.toggle_simulation()
+    Button:
+        text: "Stop editing" if root.parent and root.parent.is_editing else "Edit map"
+        size_hint: 1, None
+        height: "50dp"
+        on_release: root.parent.toggle_editing()
