@@ -55,6 +55,10 @@ class Screen(BoxLayout, KeyboardEvent):
             self.toggle_editing()
         elif keycode[1] == "r":
             self.game.toggle_simulation()
+        if keycode[1] == "c":
+            self.game.clear()
+        elif keycode[1] == "g":
+            self.game.generate()
         return True
 
     def toggle_editing(self):

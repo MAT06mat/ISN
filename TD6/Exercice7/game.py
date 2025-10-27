@@ -10,6 +10,8 @@ from kivy.properties import (
 import numpy as np
 from scipy.signal import convolve2d
 
+from record import Record
+
 
 class GameOfLife(EventDispatcher):
     """Game of Life logic"""
@@ -27,6 +29,8 @@ class GameOfLife(EventDispatcher):
     iteration: int = NumericProperty(0)
     population: int = NumericProperty(0)
 
+    record: Record = ObjectProperty(Record())
+
     simulation_event = ObjectProperty(None, allownone=True)
     display_event = ObjectProperty(None, allownone=True)
 
@@ -35,12 +39,9 @@ class GameOfLife(EventDispatcher):
     # ------------------------------
 
     def __init__(self):
-        size = self.GRID_SIZE
-        self.rows, self.cols = size
-        self.grid = (np.random.random(size) < self.INIT_LIFE_PROB).astype(np.uint8)
-        self._update_population()
         self.register_event_type("on_update")
         self.bind(SIMULATION_RATE=self._on_simulation_rate)
+        self.generate()
 
     # ------------------------------
     # Properties and helpers
@@ -88,26 +89,6 @@ class GameOfLife(EventDispatcher):
             self.grid[y, x] = value
             self._update()
 
-    # ------------------------------
-    # Simulation logic
-    # ------------------------------
-
-    def count_neighbours(self):
-        kernel = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.uint8)
-        return convolve2d(self.grid, kernel, mode="same", boundary="fill", fillvalue=0)
-
-    def step(self, *args):
-        """Advance the simulation by one step."""
-        self.iteration += 1
-        neighbours = self.count_neighbours()
-
-        survive_mask = np.isin(neighbours, self.RULES["survive"])
-        born_mask = np.isin(neighbours, self.RULES["born"])
-
-        survive = self.grid & survive_mask
-        born = ~self.grid & born_mask
-        self.grid = np.where(survive | born, 1, 0).astype(np.uint8)
-
     def draw_line(self, start, end, value):
         """Draw a line of live/dead cells using Bresenham's algorithm."""
         x0, y0 = start
@@ -129,6 +110,37 @@ class GameOfLife(EventDispatcher):
                 err += dx
                 y0 += sy
         self.set_cell(x1, y1, value)
+
+    def clear(self):
+        self.grid = np.zeros(self.GRID_SIZE).astype(np.uint8)
+        self._update()
+
+    def generate(self):
+        self.grid = (np.random.random(self.GRID_SIZE) < self.INIT_LIFE_PROB).astype(
+            np.uint8
+        )
+        self._update()
+
+    # ------------------------------
+    # Simulation logic
+    # ------------------------------
+
+    def count_neighbours(self):
+        kernel = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.uint8)
+        return convolve2d(self.grid, kernel, mode="same", boundary="fill", fillvalue=0)
+
+    def step(self, *args):
+        """Advance the simulation by one step."""
+        self.iteration += 1
+        neighbours = self.count_neighbours()
+
+        survive_mask = np.isin(neighbours, self.RULES["survive"])
+        born_mask = np.isin(neighbours, self.RULES["born"])
+
+        survive = self.grid & survive_mask
+        born = ~self.grid & born_mask
+        self.grid = np.where(survive | born, 1, 0).astype(np.uint8)
+        self.record.add(self.iteration, self.population)
 
     # ------------------------------
     # Simulation control (start / stop / toggle)

@@ -8,23 +8,25 @@
         Rectangle:
             pos: self.pos
             size: self.size
-    Label:
-        text: root.info_text
     BoxLayout:
         size_hint: 1, None
         height: "50dp"
         Button:
-            text: "-10"
-            on_release: root.game.SIMULATION_RATE -= 10
+            text: "Stop record" if root.game.record.active else "Start record"
+            on_release: root.game.record.toggle()
         Button:
-            text: "-1"
-            on_release: root.game.SIMULATION_RATE -= 1
-        Button:
-            text: "+1"
-            on_release: root.game.SIMULATION_RATE += 1
-        Button:
-            text: "+10"
-            on_release: root.game.SIMULATION_RATE += 10
+            text: "Open record"
+            on_release: root.game.record.open()
+    Label:
+        text: root.info_text
+    Slider:
+        size_hint: 1, None
+        height: "50dp"
+        min: 1
+        max: 100
+        step: 1
+        value: root.game.SIMULATION_RATE
+        on_value: root.game.SIMULATION_RATE = self.value
     Button:
         text: "Stop simulation" if root.game.is_running else "Run simulation"
         size_hint: 1, None
@@ -35,3 +37,12 @@
         size_hint: 1, None
         height: "50dp"
         on_release: root.parent.toggle_editing()
+    BoxLayout:
+        size_hint: 1, None
+        height: "50dp"
+        Button:
+            text: "Clear"
+            on_release: root.game.clear()
+        Button:
+            text: "Generate"
+            on_release: root.game.generate()
