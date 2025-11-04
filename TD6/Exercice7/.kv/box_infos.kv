@@ -16,6 +16,7 @@
             on_release: root.game.record.toggle()
         Button:
             text: "Show graph"
+            disabled: not root.game.record.exist
             on_release: root.game.record.open()
     Label:
         text: root.info_text

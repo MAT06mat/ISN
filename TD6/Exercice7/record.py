@@ -13,11 +13,13 @@ class Record(EventDispatcher):
     population: list[int] = ListProperty([])
 
     active: bool = BooleanProperty(False)
+    exist: bool = BooleanProperty(False)
 
     def start(self):
         self.iteration = []
         self.population = []
         self.active = True
+        self.exist = False
 
     def stop(self):
         self.active = False
@@ -30,6 +32,7 @@ class Record(EventDispatcher):
 
     def add(self, i, p):
         if self.active:
+            self.exist = True
             if i in self.iteration:
                 self.population[self.iteration.index(i)] = p
             else:
@@ -37,9 +40,10 @@ class Record(EventDispatcher):
                 self.population.append(p)
 
     def open(self):
-        if len(self.iteration):
-            print(">>> Display record")
-            plt.plot(self.iteration, self.population)
-            plt.xlabel("Iterations")
-            plt.ylabel("Population")
-            plt.show()
+        if not self.exist:
+            return
+        print(">>> Display record")
+        plt.plot(self.iteration, self.population)
+        plt.xlabel("Iterations")
+        plt.ylabel("Population")
+        plt.show()
