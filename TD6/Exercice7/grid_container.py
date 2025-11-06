@@ -1,5 +1,6 @@
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
+from kivy.clock import Clock
 
 from grid import Grid
 from game import GameOfLife
@@ -33,6 +34,8 @@ class GridContainer(ScatterLayout):
         if int(self.right) < min_x:
             self.right = min_x
 
+        Clock.schedule_once(lambda *args: self.grid.update_display(scale=self.scale), 0)
+
     def on_touch_down(self, touch):
         if touch.is_mouse_scrolling and not self.parent.is_editing:
             if touch.button == "scrolldown":
@@ -40,6 +43,7 @@ class GridContainer(ScatterLayout):
                     self.apply_transform(
                         Matrix().scale(1.1, 1.1, 1.1), anchor=touch.pos
                     )
+                self.grid.update_display(scale=self.scale)
                 return True
             elif touch.button == "scrollup":
                 if self.scale * 0.91 > self.scale_min:
@@ -48,5 +52,6 @@ class GridContainer(ScatterLayout):
                     )
                 else:
                     self.scale = self.scale_min
+                self.grid.update_display(scale=self.scale)
                 return True
         return super().on_touch_down(touch)

@@ -15,6 +15,7 @@ class Grid(Widget):
         self.cols, self.rows = self.game.GRID_SIZE
         self.draw_value = None
         self.do_edit = False
+        self.has_after = False
 
         self.texture = Texture.create(size=self.game.GRID_SIZE, colorfmt="rgba")
         self.texture.mag_filter = "nearest"
@@ -25,10 +26,6 @@ class Grid(Widget):
     # ------------------------------
     # Events
     # ------------------------------
-
-    def on_parent(self, *args):
-        if self.parent:
-            self.parent.bind(size=self.update_display)
 
     def on_touch_down(self, touch):
         if not self.do_edit or touch.is_mouse_scrolling:
@@ -70,7 +67,7 @@ class Grid(Widget):
     # Display
     # ------------------------------
 
-    def update_display(self, *args):
+    def update_display(self, *args, scale=None, **kwargs):
         self.size = (min(self.parent.size), min(self.parent.size))
         self.cell_size = min(self.size) / self.rows
 
@@ -84,18 +81,40 @@ class Grid(Widget):
         self.texture.blit_buffer(rgba.flatten(), colorfmt="rgba", bufferfmt="ubyte")
 
         # Draw texture
-        self.canvas.clear()
-        with self.canvas:
+        self.canvas.before.clear()
+        with self.canvas.before:
             Color(1, 1, 1)
             Rectangle(texture=self.texture, pos=self.pos, size=self.size)
-            Color(0.2, 0.2, 0.2)
-            Line(
-                points=(
-                    (self.x, self.y),
-                    (self.right, self.y),
-                    (self.right, self.top),
-                    (self.x, self.top),
-                    (self.x, self.y),
-                ),
-                width=1,
-            )
+
+        # Update black grid
+        self.update_black_grid(scale)
+
+    def update_black_grid(self, scale):
+        if scale is None:
+            return
+        # Clear or not the black grid
+        if scale < 1.5 and self.has_after:
+            self.canvas.after.clear()
+            self.has_after = False
+            return
+        # Draw of not the black grid
+        if scale >= 1.5 and not self.has_after:
+            with self.canvas.after:
+                self.has_after = True
+                Color(0, 0, 0)
+                for x in range(self.game.GRID_SIZE[0] + 1):
+                    Line(
+                        points=(
+                            (self.x + x * self.cell_size, self.y),
+                            (self.x + x * self.cell_size, self.top),
+                        ),
+                        width=self.cell_size / 15,
+                    )
+                for y in range(self.game.GRID_SIZE[1] + 1):
+                    Line(
+                        points=(
+                            (self.x, self.y + y * self.cell_size),
+                            (self.right, self.y + y * self.cell_size),
+                        ),
+                        width=self.cell_size / 15,
+                    )
