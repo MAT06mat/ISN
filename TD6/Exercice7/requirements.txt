@@ -1,0 +1,4 @@
+Kivy[base]
+numpy
+scipy
+matplotlib
