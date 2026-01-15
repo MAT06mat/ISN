@@ -22,8 +22,9 @@ INFO_TEMPLATE = (
 class BoxInfos(BoxLayout):
     info_text = StringProperty("")
 
-    def __init__(self, game: GameOfLife, **kwargs):
+    def __init__(self, game: GameOfLife, grid_c, **kwargs):
         self.game = game
+        self.grid_c = grid_c
         self.game.bind(on_update=self.update_info)
         self.update_info()
         super().__init__(**kwargs)
@@ -46,7 +47,7 @@ class Screen(BoxLayout, KeyboardEvent):
         super().__init__(**kwargs)
         self.game = GameOfLife()
         self.grid_container = GridContainer(self.game)
-        self.box_infos = BoxInfos(self.game)
+        self.box_infos = BoxInfos(self.game, self.grid_container)
         self.add_widget(self.grid_container)
         self.add_widget(self.box_infos)
 
@@ -61,6 +62,8 @@ class Screen(BoxLayout, KeyboardEvent):
             self.game.clear()
         elif keycode[1] == "g":
             self.game.generate()
+        elif keycode[1] == "m":
+            self.grid_container.grid.toggle_selection_mode()
         return True
 
     def toggle_editing(self):
@@ -71,3 +74,4 @@ class Screen(BoxLayout, KeyboardEvent):
         self.grid_container.do_translation = not self.is_editing
         self.grid_container.do_scale = not self.is_editing
         self.grid_container.grid.do_edit = self.is_editing
+        self.grid_container.grid.reset_selection()

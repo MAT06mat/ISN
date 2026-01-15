@@ -18,6 +18,12 @@
             text: "Show graph"
             disabled: not root.game.record.exist
             on_release: root.game.record.open()
+    BoxLayout:
+        size_hint: 1, None
+        height: "50dp"
+        Button:
+            text: "Select mode" if root.grid_c.grid.selection_mode else "Draw mode"
+            on_release: root.grid_c.grid.toggle_selection_mode()
     Label:
         text: root.info_text
     Slider:

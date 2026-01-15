@@ -1,5 +1,6 @@
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
+from kivy.core.window import Window
 from kivy.clock import Clock
 
 from grid import Grid
@@ -17,6 +18,8 @@ class GridContainer(ScatterLayout):
         self.auto_bring_to_front = False
         self.grid = Grid(game)
         self.add_widget(self.grid)
+
+        Window.bind(on_resize=self.reset_black_grid)
 
     def on_bbox(self, *args):
         m = min(self.size)
@@ -37,7 +40,7 @@ class GridContainer(ScatterLayout):
         Clock.schedule_once(lambda *args: self.grid.update_display(scale=self.scale), 0)
 
     def on_touch_down(self, touch):
-        if touch.is_mouse_scrolling and not self.parent.is_editing:
+        if touch.is_mouse_scrolling:
             if touch.button == "scrolldown":
                 if self.scale * 1.1 < self.scale_max:
                     self.apply_transform(
@@ -55,3 +58,9 @@ class GridContainer(ScatterLayout):
                 self.grid.update_display(scale=self.scale)
                 return True
         return super().on_touch_down(touch)
+
+    def reset_black_grid(self, *args):
+        # Reset black grid
+        Clock.schedule_once(lambda *args: self.grid.update_display(scale=1), 0)
+        # Set to the new value
+        Clock.schedule_once(lambda *args: self.grid.update_display(scale=self.scale), 0)

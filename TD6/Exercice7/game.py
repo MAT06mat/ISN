@@ -111,6 +111,37 @@ class GameOfLife(EventDispatcher):
                 y0 += sy
         self.set_cell(x1, y1, value)
 
+    def get_selection(self, start_pos, end_pos):
+        x1, y1 = start_pos
+        x2, y2 = end_pos
+
+        xmin = min(x1, x2)
+        xmax = max(x1, x2) + 1
+        ymin = min(y1, y2)
+        ymax = max(y1, y2) + 1
+
+        return self.grid[ymin:ymax, xmin:xmax]
+
+    def set_selection(self, pos, selection):
+        px, py = pos
+        y, x = selection.shape
+
+        if px + x > self.GRID_SIZE[0]:
+            selection = selection[0:y, 0 : self.GRID_SIZE[0] - px]
+            y, x = selection.shape
+        elif py + y > self.GRID_SIZE[1]:
+            selection = selection[0 : self.GRID_SIZE[1] - py, 0:x]
+            y, x = selection.shape
+        elif px < 0:
+            selection = selection[0:y, -px:x]
+            y, x = selection.shape
+        elif py < 0:
+            selection = selection[-py:y, 0:x]
+            y, x = selection.shape
+
+        self.grid[max(py, 0) : max(py, 0) + y, max(px, 0) : max(px, 0) + x] = selection
+        self._update()
+
     def clear(self):
         self.grid = np.zeros(self.GRID_SIZE).astype(np.uint8)
         self._update()
